@@ -1,4 +1,4 @@
-import { verifyToken, makeAccessTokenFactory, JWT } from '@chatdaddy/service-auth-client'
+import { verifyToken, makeAccessTokenFactory, JWT } from '@logosrhema01/service-auth-client'
 import logger from './logger'
 
 const getAccessToken = makeAccessTokenFactory({

@@ -1,4 +1,4 @@
-import { JWT, Scope, validateUserScopes } from "@chatdaddy/service-auth-client";
+import { JWT, Scope, validateUserScopes } from "@logosrhema01/service-auth-client";
 import OpenAPIBackend from "openapi-backend";
 import { Boom } from "@hapi/boom";
 import { Handler as APIHandler } from 'openapi-backend'
@@ -17,7 +17,7 @@ import { Logger } from "pino";
 // get all operations from openAPI
 export type Operation = keyof operations
 // just a typealias
-type ChatDaddyAPIUser = JWT
+type AlteAPIUser = JWT
 // add missing parameters
 // (not all operations have all these, so we add them)
 type FullOp<O extends Operation> = operations[O] & {
@@ -38,7 +38,7 @@ type FullOp<O extends Operation> = operations[O] & {
 		}
 	}
 }
-export type Authentication = { chatdaddy?: ChatDaddyAPIUser }
+export type Authentication = { alte?: AlteAPIUser }
 // full request type of an operation -- query + parameters + requestBody
 export type FullRequest<O extends Operation> = FullOp<O>['parameters']['query'] & FullOp<O>['parameters']['path'] & FullOp<O>['requestBody']['content']['application/json']
 // the response type of an operation
@@ -79,7 +79,7 @@ function errorHandlingWrap<O extends Operation>(handler: Handler<O>): APIHandler
 				throw e.security.user.error
 			}
 			auth = e.security
-			logger = logger.child({ teamId: auth?.chatdaddy?.user?.teamId })
+			logger = logger.child({ orgId: auth?.alte?.user?.orgId })
 			result.body = await handler(
 				fullRequest, 
 				{ db: await getConnection() }, 
@@ -117,7 +117,7 @@ function errorHandlingWrap<O extends Operation>(handler: Handler<O>): APIHandler
 				res: result.body,
 				req: fullRequest,
 				statusCode: result.statusCode,
-				actor: auth?.chatdaddy?.user,
+				actor: auth?.alte?.user,
 			}, 'processed request')
 		}
 

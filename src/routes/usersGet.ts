@@ -10,7 +10,7 @@ const handler: Handler<'usersGet'> = async (
         page
     }, 
 	{ db }, // db connection
-    { user } // user that made the request
+    { alte } // user that made the request
 ) => {
     // a "Boom" error is automatically parsed and returned as a JSON formatted error response
     // with the specified status code

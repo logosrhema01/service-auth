@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@chatdaddy/service-auth-client": "git+https://github.com/chatdaddy/service-auth-client.git",
+    "@logosrhema01/service-auth-client": "git+https://github.com/logosrhema01/service-auth-client.git",
     "@hapi/boom": "^9.1.2",
     "chance": "^1.1.7",
     "dotenv": "^8.2.0",

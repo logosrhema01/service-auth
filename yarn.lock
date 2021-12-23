@@ -304,14 +304,6 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@chatdaddy/service-auth-client@git+https://github.com/chatdaddy/service-auth-client.git":
-  version "0.1.0"
-  resolved "git+https://github.com/chatdaddy/service-auth-client.git#17a427cc94599ee1fbf5fe7d9dd9fc6185aa2332"
-  dependencies:
-    axios "^0.21.1"
-  optionalDependencies:
-    jsonwebtoken "^8.5.1"
-
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.4.tgz#f864ae85004d0fcab6f50be9141c4da368d1656a"
@@ -822,6 +814,14 @@
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@kwsites/promise-deferred/-/promise-deferred-1.1.1.tgz#8ace5259254426ccef57f3175bc64ed7095ed919"
   integrity sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==
+
+"@logosrhema01/service-auth-client@git+https://github.com/logosrhema01/service-auth-client.git":
+  version "0.1.0"
+  resolved "git+https://github.com/logosrhema01/service-auth-client.git#3ac26ead14cf052ebfd7634659ddc209cb25270d"
+  dependencies:
+    axios "^0.21.1"
+  optionalDependencies:
+    jsonwebtoken "^8.5.1"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
