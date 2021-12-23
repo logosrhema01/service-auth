@@ -1,0 +1,37 @@
+service: generic-service # CHANGE
+
+frameworkVersion: "2"
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: v1 # Default stage to be used. Default is "dev"
+  region: ap-east-1 # Default region to be used. Default is "us-east-1"
+  apiName: ${self:service}
+  iam: # allow publishing SNS events
+    role:
+      statements:
+        - Effect: 'Allow'
+          Action:
+            - "sns:Publish"
+          Resource:
+            - "*"
+functions:
+  api:
+    handler: src/functions/api.handler
+    timeout: 10
+    reservedConcurrency: 5
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+plugins: 
+  - serverless-plugin-typescript
+  - serverless-offline
+  - serverless-dotenv-plugin
+  
+package: 
+  patterns:
+    - openapi.yaml
