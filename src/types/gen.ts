@@ -4,378 +4,453 @@
  */
 
 export interface paths {
+  "/token": {
+    /** Returns in descending order of most recently used */
+    get: operations["tokenGet"];
+    post: operations["tokenPost"];
+    /** If the token is not specified, all tokens of the user are revoked */
+    delete: operations["tokenDelete"];
+  };
+  "/token/external": {
+    post: operations["tokenPostExternal"];
+  };
+  "/invite-links": {
+    /**
+     * To generate an invite link for a specific set of scopes, you must also have the same set of scopes.
+     * Eg. you cannot generate a link which gives access to `MESSAGE_SEND` when you don't have access to `MESSAGE_SEND` yourself.
+     * This is done for obvious security concerns.
+     */
+    post: operations["inviteLinksPost"];
+  };
+  "/invite-links/{id}": {
+    get: operations["inviteLinksGet"];
+  };
+  "/teams": {
+    get: operations["teamsGet"];
+    /**
+     * - If you want to update/delete members -- ensure you have the `TEAMMEMBERS_UPDATE` scope
+     * - If you want to delete invite links -- ensure you have the `TEAMLINKS_UPDATE` scope
+     * - Also you cannot delete/update yourself in the team. If you attempt to do so, a 400 will be returned
+     */
+    patch: operations["teamsPatch"];
+  };
+  "/teams/join": {
+    post: operations["teamsJoinInvite"];
+  };
   "/users": {
     get: operations["usersGet"];
+    post: operations["usersPost"];
+    /** Deletes the user specified */
+    delete: operations["usersDelete"];
+    patch: operations["usersPatch"];
+  };
+  "/users/password": {
+    patch: operations["usersPasswordPatch"];
+  };
+  "/otp": {
+    post: operations["otpPost"];
+  };
+  "/notify": {
+    post: operations["notify"];
   };
 }
 
 export interface components {
   schemas: {
-    "user-create": {
-      /** Name of the user */
-      name: string;
-      /** Age of user */
-      age: number;
-    };
-    "user-model": {
-      id: number;
-      createdAt: components["schemas"]["timestamp"];
-      /** Users Role */
-      role: "Student" | "Staff";
-      /** Users First Name */
-      first_name: string;
-      /** Users Last Name */
-      last_name?: string;
-      /** Users Other Name */
-      other_name?: string;
-      /** Users Passport photo */
-      profile_image?: string;
-      email?: string;
-      /** Users assigned Id */
-      user_id?: number;
-      /** Student's Passcode */
-      password?: number;
-      gender?: "male" | "female" | "other";
-      phone?: string;
-    } & components["schemas"]["user-create"];
-    /** An ISO formatted timestamp */
-    timestamp: Date | string;
-    /** Student description */
-    StudentDetails: {
-      /** If Student, their programme */
-      programme: string;
-      /** Date Student Entered University */
-      entry_date: string;
-      hall?:
-        | "Legon"
-        | "Volta"
-        | "Mensah Sarbah"
-        | "Akuafo"
-        | "Common Wealth"
-        | "Dr. Hilla Liman"
-        | "Alexander Kwapong"
-        | "Elizabeth Frances Sey"
-        | "Jean Nelson"
-        | "Non-Resident";
-      place_of_birth: string;
-      region: string;
-      guardian_or_kin: components["schemas"]["GuardianKin"];
-      nationality: components["schemas"]["Nationality"];
-      stages?: { [key: string]: components["schemas"]["Stage"] };
-      medical?: components["schemas"]["Medical"];
-      complaints?: { [key: string]: components["schemas"]["Complaint"] };
-    };
-    StaffDetails: {
-      /** Not included in MVP */
-      dept: { [key: string]: any };
-    };
-    Stage: {
-      offering_type: "full-time" | "part-time";
-      level: 100 | 200 | 300 | 400;
-      /** Degree type student is pursing, eg, first is Bachelors */
-      cycle: "first" | "second" | "third";
-      semester: "first" | "second";
-      courses: { [key: string]: components["schemas"]["Course"] };
-    };
-    Course: {
-      name: string;
-      credit: number;
-      course_staff: { [key: string]: components["schemas"]["CourseStaff"] };
-    };
-    CourseStaff: {
-      staff?: {
-        role?: "lecturer" | "teaching_assistant";
-        staff_id?: string;
+    Scope:
+      | "WA_STATE"
+      | "CONTACTS_READ_ASSIGNED"
+      | "CONTACTS_READ_ALL"
+      | "CONTACTS_EXPORT_BUTTON"
+      | "CONTACTS_CREATE"
+      | "CONTACTS_DELETE"
+      | "CONTACTS_UPDATE"
+      | "CAMPAIGNS_READ"
+      | "CAMPAIGNS_CREATE"
+      | "CAMPAIGNS_DELETE"
+      | "CAMPAIGNS_UPDATE"
+      | "KEYWORD_READ"
+      | "KEYWORD_CREATE"
+      | "KEYWORD_DELETE"
+      | "KEYWORD_UPDATE"
+      | "TEMPLATES_READ"
+      | "TEMPLATES_CREATE"
+      | "TEMPLATES_DELETE"
+      | "TEMPLATES_UPDATE"
+      | "TAGS_READ"
+      | "TAGS_CREATE"
+      | "TAGS_DELETE"
+      | "TOKENS_READ"
+      | "TOKENS_DELETE"
+      | "USERS_PATCH"
+      | "REFERRAL_APPLY_CREDIT"
+      | "TEAM_UPDATE"
+      | "ACCOUNT_CREATE"
+      | "ACCOUNT_READ"
+      | "ACCOUNT_DELETE"
+      | "ACCOUNT_PATCH"
+      | "TEAMLINK_CREATE"
+      | "TEAMLINK_READ"
+      | "TEAMMEMBERS_UPDATE"
+      | "TEAMMEMBERS_READ"
+      | "TEAM_NOTIFY"
+      | "CHATS_ACCESS_ALL"
+      | "CHATS_ACCESS_ASSIGNED"
+      | "CHATS_DELETE"
+      | "MESSAGES_SEND_TO_ASSIGNED"
+      | "MESSAGES_SEND_TO_ALL"
+      | "MESSAGES_SCHEDULE"
+      | "MESSAGES_DELETE"
+      | "GROUPS_CREATE"
+      | "GROUPS_UPDATE"
+      | "NOTES"
+      | "NOTIFICATION_READ"
+      | "NOTIFICATION_CREATE"
+      | "NOTIFICATION_UPDATE"
+      | "NOTIFICATION_DELETE"
+      | "INTEGRATIONS_UPDATE"
+      | "ADMIN_PANEL_ACCESS"
+      | "PAYMENTS_READ"
+      | "PAYMENTS_UPDATE"
+      | "WA_LIVE_EVENTS"
+      | "CHATDADDY_HOOK";
+    JWT: {
+      /** Binary representation of the scope array */
+      scope: string;
+      exp: number;
+      iat: number;
+      user: {
+        id: string;
+        teamId: string;
+        fullName?: string;
+        phoneNumber: number;
       };
-      /** Weeks the staff handled the course */
-      time?: "full" | "partial";
-      dates?: {
-        start?: string;
-        end?: string;
-      };
-      staff_id?: string;
     };
-    GuardianKin: {
-      /** Users First Name */
-      first_name: string;
-      /** Users Last Name */
-      last_name: string;
-      email?: string;
-      phone: string;
+    /** Login with Boutir */
+    BoutirTokenRequest: {
+      type: "boutir";
+      username: string;
+      password: string;
     };
-    Medical: {
-      questions?: {
-        history?: { [key: string]: components["schemas"]["MedicalHistory"] };
-        dentals?: { [key: string]: components["schemas"]["DentalExamination"] };
-        immunization?: {
-          [key: string]: components["schemas"]["PastImmunization"];
+    ExternalTokenRequest: components["schemas"]["BoutirTokenRequest"];
+    TokenPostResponse: {
+      access_token: string;
+      refresh_token?: string;
+      refresh_token_expiry?: components["schemas"]["Timestamp"];
+    };
+    ExternalTokenPostResponse: {
+      /** Was the user just created */
+      created?: boolean;
+    } & components["schemas"]["TokenPostResponse"];
+    PasswordAuthRequest: {
+      phoneNumber: number;
+      returnRefreshToken?: boolean;
+      /** This will be the base64 encoded SHA256 of the plaintext password */
+      password: string;
+      /** The team ID to generate the token for, lastUsedTeam will be used otherwise */
+      teamId?: string;
+      scopes?: components["schemas"]["Scope"][];
+      /** Should logging in with this team ID update the lastUsedTeam for login */
+      updateLastUsedTeam?: boolean;
+      /** Force the generation of an access token */
+      force?: boolean;
+    };
+    RefreshTokenLoginRequest: {
+      refreshToken: string;
+      /** The team ID to generate the token for, lastUsedTeam will be used otherwise */
+      teamId: string;
+      scopes?: components["schemas"]["Scope"][];
+      /** Should fetching the token of a new team update the lastUsedTeam for login */
+      updateLastUsedTeam?: boolean;
+      /** Force the generation of an access token */
+      force?: boolean;
+    };
+    AuthRequest:
+      | components["schemas"]["PasswordAuthRequest"]
+      | components["schemas"]["RefreshTokenLoginRequest"];
+    OAuthRequest: {
+      /** The phone number */
+      username: string;
+      /** Plaintext password */
+      password: string;
+      grant_type?: "password";
+      /** Space separated scopes */
+      scope?: string;
+    };
+    /**
+     * A refresh token allows you to generate access tokens to access & update things on ChatDaddy services.
+     * A refresh token will expire and become invalidated after 14 days of no activity.
+     */
+    RefreshToken: {
+      token: string;
+      userId: string;
+      createdAt: components["schemas"]["Timestamp"];
+      expiresAt: components["schemas"]["Timestamp"];
+    };
+    NotifyModel: {
+      whatsapp?: boolean;
+      email?: boolean;
+    };
+    ResetPassword: {
+      password: string;
+    };
+    UserPatch: {
+      fullName?: string;
+      emailAddress?: string | null;
+      notify?: components["schemas"]["NotifyModel"];
+      /** Phone number. Only admin access can modify */
+      phoneNumber?: number;
+      /** new password. Only admin access can modify */
+      password?: string;
+    };
+    UserCreate: {
+      fullName: string;
+      /** Will only contain numbers, no + sign, brackets etc. */
+      phoneNumber: number;
+      /** SHA256 of the plaintext password pls */
+      password: string;
+      emailAddress?: string | null;
+      notify?: components["schemas"]["NotifyModel"];
+      /** Sign up with a referral code */
+      referralCode?: string;
+    };
+    UserCreateMethod: "admin-panel" | "otp" | "boutir";
+    User: {
+      id: string;
+      createdAt: components["schemas"]["Timestamp"];
+      updatedAt: components["schemas"]["Timestamp"];
+      disabledAt?: components["schemas"]["Timestamp"];
+      fullName: string;
+      /** The last used team ID, your refresh token when logging in is generated for this team */
+      lastUsedTeamId?: string;
+      /** Will only contain numbers, no + sign, brackets etc. */
+      phoneNumber: number;
+      emailAddress?: string | null;
+      createdByMethod?: components["schemas"]["UserCreateMethod"];
+      notify: components["schemas"]["NotifyModel"];
+      /** The referral code used for sign-up */
+      referralCode?: string | null;
+      memberships?: components["schemas"]["TeamMember"][];
+    };
+    TeamMember: {
+      team?: components["schemas"]["Team"];
+      user?: components["schemas"]["User"];
+      userId: string;
+      teamId: string;
+      addedAt: components["schemas"]["Timestamp"];
+      addedBy?: string | null;
+      scopes: components["schemas"]["Scope"][];
+    };
+    TeamMetadata: {
+      companyName?: string;
+      companyEmailAddress?: string;
+      companyWebsite?: string;
+    };
+    InviteLink: {
+      id: string;
+      /** The team it can join */
+      teamId: string;
+      /** User ID of the person who created the link */
+      createdBy: string;
+      createdAt: components["schemas"]["Timestamp"];
+      expiresAt: components["schemas"]["Timestamp"];
+      /** The scopes allowed for the invite link */
+      scopes: components["schemas"]["Scope"][];
+    };
+    Team: {
+      id: string;
+      createdAt: components["schemas"]["Timestamp"];
+      updatedAt: components["schemas"]["Timestamp"];
+      /** Who created the team */
+      createdBy?: string;
+      name: string;
+      /** Is an admin team */
+      isAdmin?: boolean;
+      /** The max scopes allowed */
+      scopes: components["schemas"]["Scope"][];
+      metadata: components["schemas"]["TeamMetadata"];
+      members?: components["schemas"]["TeamMember"][];
+      inviteLinks?: components["schemas"]["InviteLink"][];
+    };
+    TeamPatchRequest: {
+      name?: string;
+      metadata?: components["schemas"]["TeamMetadata"];
+      members?: {
+        id: string;
+        scopes?: components["schemas"]["Scope"][];
+        /** If set, will delete the team member */
+        delete?: true;
+      }[];
+      inviteLinks?: {
+        id: string;
+        /** If set, will delete the invite link */
+        delete?: true;
+      }[];
+    };
+    OTP: {
+      phoneNumber: number;
+      otp?: number;
+      expiresAt: components["schemas"]["Timestamp"];
+      resendsLeft: number;
+    };
+    Timestamp: Date | string;
+    NotificationResult: string | boolean;
+  };
+  responses: {
+    /** There was an error */
+    ErrorResponse: {
+      content: {
+        "application/json": {
+          statusCode?: number;
+          /** Specific description of the error */
+          error?: string;
+          /** What the error was */
+          message?: string;
+          /** Some extra information about the error */
+          data?: { [key: string]: any };
         };
       };
-      additional_info?: string;
     };
-    MedicalHistory: {
-      question: string;
-      answer?: boolean;
-    };
-    DentalExamination: {
-      question: string;
-      answer?: { [key: string]: string };
-    };
-    PastImmunization: {
-      question: string;
-      date: string;
-      answer?: boolean;
-    };
-    Complaint: {
-      compliant_type: string;
-      additional_info?: string;
-    };
-    Nationality:
-      | "Afghanistan"
-      | "Albania"
-      | "Algeria"
-      | "American Samoa"
-      | "Andorra"
-      | "Angola"
-      | "Anguilla"
-      | "Antarctica"
-      | "Antigua and Barbuda"
-      | "Argentina"
-      | "Armenia"
-      | "Aruba"
-      | "Australia"
-      | "Austria"
-      | "Azerbaijan"
-      | "Bahamas"
-      | "Bahrain"
-      | "Bangladesh"
-      | "Barbados"
-      | "Belarus"
-      | "Belgium"
-      | "Belize"
-      | "Benin"
-      | "Bermuda"
-      | "Bhutan"
-      | "Bolivia"
-      | "Bosnia and Herzegovina"
-      | "Botswana"
-      | "Brazil"
-      | "British Indian Ocean Territory"
-      | "British Virgin Islands"
-      | "Brunei"
-      | "Bulgaria"
-      | "Burkina Faso"
-      | "Burundi"
-      | "Cambodia"
-      | "Cameroon"
-      | "Canada"
-      | "Cape Verde"
-      | "Cayman Islands"
-      | "Central African Republic"
-      | "Chad"
-      | "Chile"
-      | "China"
-      | "Christmas Island"
-      | "Cocos Islands"
-      | "Colombia"
-      | "Comoros"
-      | "Cook Islands"
-      | "Costa Rica"
-      | "Croatia"
-      | "Cuba"
-      | "Cyprus"
-      | "Czech Republic"
-      | "Democratic Republic of the Congo"
-      | "Denmark"
-      | "Djibouti"
-      | "Dominica"
-      | "Dominican Republic"
-      | "East Timor"
-      | "Ecuador"
-      | "Egypt"
-      | "El Salvador"
-      | "Equatorial Guinea"
-      | "Eritrea"
-      | "Estonia"
-      | "Ethiopia"
-      | "Falkland Islands"
-      | "Faroe Islands"
-      | "Fiji"
-      | "Finland"
-      | "France"
-      | "French Polynesia"
-      | "Gabon"
-      | "Gambia"
-      | "Georgia"
-      | "Germany"
-      | "Ghana"
-      | "Gibraltar"
-      | "Greece"
-      | "Greenland"
-      | "Grenada"
-      | "Guam"
-      | "Guatemala"
-      | "Guinea"
-      | "Guinea-Bissau"
-      | "Guyana"
-      | "Haiti"
-      | "Honduras"
-      | "Hong Kong"
-      | "Hungary"
-      | "Iceland"
-      | "India"
-      | "Indonesia"
-      | "Iran"
-      | "Iraq"
-      | "Ireland"
-      | "Isle of Man"
-      | "Israel"
-      | "Italy"
-      | "Ivory Coast"
-      | "Jamaica"
-      | "Japan"
-      | "Jersey"
-      | "Jordan"
-      | "Kazakhstan"
-      | "Kenya"
-      | "Kiribati"
-      | "Kuwait"
-      | "Kyrgyzstan"
-      | "Laos"
-      | "Latvia"
-      | "Lebanon"
-      | "Lesotho"
-      | "Liberia"
-      | "Libya"
-      | "Liechtenstein"
-      | "Lithuania"
-      | "Luxembourg"
-      | "Macao"
-      | "Macedonia"
-      | "Madagascar"
-      | "Malawi"
-      | "Malaysia"
-      | "Maldives"
-      | "Mali"
-      | "Malta"
-      | "Marshall Islands"
-      | "Mauritania"
-      | "Mauritius"
-      | "Mayotte"
-      | "Mexico"
-      | "Micronesia"
-      | "Moldova"
-      | "Monaco"
-      | "Mongolia"
-      | "Montenegro"
-      | "Montserrat"
-      | "Morocco"
-      | "Mozambique"
-      | "Myanmar"
-      | "Namibia"
-      | "Nauru"
-      | "Nepal"
-      | "Netherlands"
-      | "Netherlands Antilles"
-      | "New Caledonia"
-      | "New Zealand"
-      | "Nicaragua"
-      | "Niger"
-      | "Nigeria"
-      | "Niue"
-      | "North Korea"
-      | "Northern Mariana Islands"
-      | "Norway"
-      | "Oman"
-      | "Pakistan"
-      | "Palau"
-      | "Panama"
-      | "Papua New Guinea"
-      | "Paraguay"
-      | "Peru"
-      | "Philippines"
-      | "Pitcairn"
-      | "Poland"
-      | "Portugal"
-      | "Puerto Rico"
-      | "Qatar"
-      | "Republic of the Congo"
-      | "Romania"
-      | "Russia"
-      | "Rwanda"
-      | "Saint Barthelemy"
-      | "Saint Helena"
-      | "Saint Kitts and Nevis"
-      | "Saint Lucia"
-      | "Saint Martin"
-      | "Saint Pierre and Miquelon"
-      | "Saint Vincent and the Grenadines"
-      | "Samoa"
-      | "San Marino"
-      | "Sao Tome and Principe"
-      | "Saudi Arabia"
-      | "Senegal"
-      | "Serbia"
-      | "Seychelles"
-      | "Sierra Leone"
-      | "Singapore"
-      | "Slovakia"
-      | "Slovenia"
-      | "Solomon Islands"
-      | "Somalia"
-      | "South Africa"
-      | "South Georgia and the South Sandwich Islands"
-      | "South Korea"
-      | "Spain"
-      | "Sri Lanka"
-      | "Sudan"
-      | "Suriname"
-      | "Svalbard and Jan Mayen"
-      | "Swaziland"
-      | "Sweden"
-      | "Switzerland"
-      | "Syria"
-      | "Taiwan"
-      | "Tajikistan"
-      | "Tanzania"
-      | "Thailand"
-      | "Togo"
-      | "Tokelau"
-      | "Tonga"
-      | "Trinidad and Tobago"
-      | "Tunisia"
-      | "Turkey"
-      | "Turkmenistan"
-      | "Turks and Caicos Islands"
-      | "Tuvalu"
-      | "U.S. Virgin Islands"
-      | "Uganda"
-      | "Ukraine"
-      | "United Arab Emirates"
-      | "United Kingdom"
-      | "United States"
-      | "Uruguay"
-      | "Uzbekistan"
-      | "Vanuatu"
-      | "Vatican"
-      | "Venezuela"
-      | "Vietnam"
-      | "Wallis and Futuna"
-      | "Western Sahara"
-      | "Yemen"
-      | "Zambia"
-      | "Zimbabwe";
   };
 }
 
 export interface operations {
-  usersGet: {
+  /** Returns in descending order of most recently used */
+  tokenGet: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["RefreshToken"][];
+        };
+      };
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+  };
+  tokenPost: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            access_token: string;
+            refresh_token?: string;
+            refresh_token_expiry?: components["schemas"]["Timestamp"];
+            was_forced?: boolean;
+          };
+        };
+      };
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      409: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AuthRequest"];
+      };
+    };
+  };
+  /** If the token is not specified, all tokens of the user are revoked */
+  tokenDelete: {
     parameters: {
       query: {
-        /** Search for users */
-        q?: string | null;
+        token?: string;
+      };
+    };
+    responses: {
+      /** Revoked */
+      204: never;
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+  };
+  tokenPostExternal: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ExternalTokenPostResponse"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExternalTokenRequest"];
+      };
+    };
+  };
+  /**
+   * To generate an invite link for a specific set of scopes, you must also have the same set of scopes.
+   * Eg. you cannot generate a link which gives access to `MESSAGE_SEND` when you don't have access to `MESSAGE_SEND` yourself.
+   * This is done for obvious security concerns.
+   */
+  inviteLinksPost: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["InviteLink"];
+        };
+      };
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          scopes: components["schemas"]["Scope"][];
+        };
+      };
+    };
+  };
+  inviteLinksGet: {
+    parameters: {
+      path: {
+        /** the invite link ID */
+        id: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["InviteLink"];
+        };
+      };
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+  };
+  teamsGet: {
+    parameters: {
+      query: {
+        /** Search by name, ID, invite code, etc. */
+        q?: string;
+        /** Fetch specific teams by ID */
+        id?: string[];
+        /** teams that contain this user ID */
+        userId?: string;
+        /** The numbers of items to return */
         count?: number;
+        /** The page number */
         page?: number;
+        /** Should include the team members. Will only return members for which you have the `TEAMMEMBERS_READ` scope */
+        includeTeamMembers?: boolean;
+        /** Should include the invite links.  Will only return invite links for which you have the `TEAMLINKS_READ` scope */
+        includeInviteLinks?: boolean;
+        /** include the count of the total teams */
+        includeTotal?: boolean;
       };
     };
     responses: {
@@ -383,8 +458,211 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            users: components["schemas"]["user-model"][];
+            total?: number;
+            teams: components["schemas"]["Team"][];
           };
+        };
+      };
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+  };
+  /**
+   * - If you want to update/delete members -- ensure you have the `TEAMMEMBERS_UPDATE` scope
+   * - If you want to delete invite links -- ensure you have the `TEAMLINKS_UPDATE` scope
+   * - Also you cannot delete/update yourself in the team. If you attempt to do so, a 400 will be returned
+   */
+  teamsPatch: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            success: boolean;
+          };
+        };
+      };
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TeamPatchRequest"];
+      };
+    };
+  };
+  teamsJoinInvite: {
+    parameters: {
+      query: {
+        /** inviteLink id */
+        id: string;
+      };
+    };
+    responses: {
+      /** OK */
+      204: never;
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      404: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+  };
+  usersGet: {
+    parameters: {
+      query: {
+        /** Search by name, ID, email, phone etc. */
+        q?: string;
+        /** Fetch specific users by ID */
+        id?: string[];
+        /** The numbers of items to return */
+        count?: number;
+        /** The page number */
+        page?: number;
+        /** Should include the user's memberships */
+        includeMemberships?: boolean;
+        /** should return total count of accessible users */
+        includeTotal?: boolean;
+        /** other internal query options */
+        other?: string[];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            total?: number;
+            users: components["schemas"]["User"][];
+          };
+        };
+      };
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+  };
+  usersPost: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["User"];
+        };
+      };
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      409: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserCreate"];
+      };
+    };
+  };
+  /** Deletes the user specified */
+  usersDelete: {
+    parameters: {
+      query: {
+        id: string;
+      };
+    };
+    responses: {
+      /** Deleted */
+      204: never;
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+  };
+  usersPatch: {
+    parameters: {
+      query: {
+        /** Change the password of this user ID */
+        userId?: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["User"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserPatch"];
+      };
+    };
+  };
+  usersPasswordPatch: {
+    responses: {
+      /** OK */
+      204: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ResetPassword"];
+      };
+    };
+  };
+  otpPost: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["OTP"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          phoneNumber: string;
+        };
+      };
+    };
+  };
+  notify: {
+    parameters: {
+      query: {
+        userId: string;
+        /** Override notify on WhatsApp */
+        notifyWhatsApp?: boolean;
+        /** Override notify on Email */
+        notifyEmail?: boolean;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            whatsapp: components["schemas"]["NotificationResult"];
+            email: components["schemas"]["NotificationResult"];
+          };
+        };
+      };
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      404: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          title: string;
+          content: string;
+          parameters?: { [key: string]: any };
         };
       };
     };
