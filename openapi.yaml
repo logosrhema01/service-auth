@@ -299,8 +299,7 @@ paths:
         '500':
           $ref: '#/components/responses/ErrorResponse'
       security:
-        - alte:
-            - ORG_CREATE
+        - alte: []
     patch:
       operationId: orgsPatch
       summary: Update the organization the access token is for
@@ -632,62 +631,17 @@ components:
     Scope:
       type: string
       enum:
-        - WA_STATE
-        - CONTACTS_READ_ASSIGNED
-        - CONTACTS_READ_ALL
-        - CONTACTS_EXPORT_BUTTON
-        - CONTACTS_CREATE
-        - CONTACTS_DELETE
-        - CONTACTS_UPDATE
-        - CAMPAIGNS_READ
-        - CAMPAIGNS_CREATE
-        - CAMPAIGNS_DELETE
-        - CAMPAIGNS_UPDATE
-        - KEYWORD_READ
-        - KEYWORD_CREATE
-        - KEYWORD_DELETE
-        - KEYWORD_UPDATE
-        - TEMPLATES_READ
-        - TEMPLATES_CREATE
-        - TEMPLATES_DELETE
-        - TEMPLATES_UPDATE
-        - TAGS_READ
-        - TAGS_CREATE
-        - TAGS_DELETE
         - TOKENS_READ
         - TOKENS_DELETE
         - USERS_PATCH
-        - REFERRAL_APPLY_CREDIT
-        - TEAM_UPDATE
-        - ACCOUNT_CREATE
-        - ACCOUNT_READ
-        - ACCOUNT_DELETE
-        - ACCOUNT_PATCH
-        - TEAMLINK_CREATE
-        - TEAMLINK_READ
-        - TEAMMEMBERS_UPDATE
-        - TEAMMEMBERS_READ
+        - USERS_DELETE
+        - ORG_UPDATE
+        - ORGLINK_CREATE
+        - ORGLINK_READ
+        - ORGMEMBERS_UPDATE
+        - ORGMEMBERS_READ
         - TEAM_NOTIFY
-        - CHATS_ACCESS_ALL
-        - CHATS_ACCESS_ASSIGNED
-        - CHATS_DELETE
-        - MESSAGES_SEND_TO_ASSIGNED
-        - MESSAGES_SEND_TO_ALL
-        - MESSAGES_SCHEDULE
-        - MESSAGES_DELETE
-        - GROUPS_CREATE
-        - GROUPS_UPDATE
-        - NOTES
-        - NOTIFICATION_READ
-        - NOTIFICATION_CREATE
-        - NOTIFICATION_UPDATE
-        - NOTIFICATION_DELETE
-        - INTEGRATIONS_UPDATE
         - ADMIN_PANEL_ACCESS
-        - PAYMENTS_READ
-        - PAYMENTS_UPDATE
-        - WA_LIVE_EVENTS
-        - CHATDADDY_HOOK
     JWT:
       type: object
       additionalProperties: false
@@ -754,8 +708,8 @@ components:
         orgId:
           type: string
           description: >-
-            The team ID to generate the token for, lastUsedOrgId will be used
-            otherwise
+            The organization ID to generate the token for, lastUsedOrgId will be
+            used otherwise
         scopes:
           type: array
           items:
@@ -791,8 +745,8 @@ components:
         updateLastUsedOrgId:
           type: boolean
           description: >-
-            Should fetching the token of a new team update the lastUsedOrgId for
-            login
+            Should fetching the token of a new organization update the
+            lastUsedOrgId for login
           default: false
         force:
           type: boolean
@@ -994,8 +948,8 @@ components:
           type: string
           format: uuid
           description: >-
-            The last used team ID, your refresh token when logging in is
-            generated for this team
+            The last used organization ID, your refresh token when logging in is
+            generated for this organization
         location:
           type: string
           example: Accra, Ghana
@@ -1275,59 +1229,14 @@ components:
         password:
           tokenUrl: https://api-auth.alte-lms.tech/oauth2/token
           scopes:
-            WA_STATE: Open, close, logout from your WA account
-            CONTACTS_READ_ASSIGNED: Read profile contacts
-            CONTACTS_READ_ALL: Read Audience contacts
-            CONTACTS_EXPORT_BUTTON: Export Contacts
-            CONTACTS_CREATE: Allow the creation of contacts
-            CONTACTS_DELETE: Allow the deletion of contacts
-            CONTACTS_UPDATE: Allow the updating of contacts
-            CAMPAIGNS_READ: Allow the reading of Broadcast Campaigns
-            CAMPAIGNS_CREATE: Allow the creation of Broadcast Campaigns
-            CAMPAIGNS_DELETE: Allow the deletion of Broadcast Campaigns
-            CAMPAIGNS_UPDATE: Allow the updating of Broadcast Campaigns
-            KEYWORD_READ: Allow the reading of Automated Keyword Replies
-            KEYWORD_CREATE: Allow the creation of Automated Keyword Replies
-            KEYWORD_DELETE: Allow the deletion of Automated Keyword Replies
-            KEYWORD_UPDATE: Allow the updating of Automated Keyword Replies
-            TEMPLATES_READ: Allow the reading of Message Templates
-            TEMPLATES_CREATE: Allow the creation of Message Templates
-            TEMPLATES_DELETE: Allow the deletion of Message Templates
-            TEMPLATES_UPDATE: Allow the updating of Message Templates
-            TAGS_READ: Can read tags
-            TAGS_CREATE: Allow the creation of Tags
-            TAGS_DELETE: Allow the deletion of Tags
             TOKENS_READ: Read all tokens belonging to your account
             TOKENS_DELETE: Delete a token belonging to your account
             USERS_PATCH: Update your personal info
-            REFERRAL_APPLY_CREDIT: Apply credit to coupon code from pending credit
-            TEAM_UPDATE: Modify the details of the team
-            ACCOUNT_CREATE: Add an additional IM account
-            ACCOUNT_READ: Read all available accounts
-            ACCOUNT_DELETE: Delete an IM account
-            ACCOUNT_PATCH: Update an existing IM account (open, close, logout etc)
-            TEAMLINK_CREATE: Create a new invite link for the team
-            TEAMLINK_READ: Read invite links of the team
-            TEAMMEMBERS_UPDATE: Update/delete team members
-            TEAMMEMBERS_READ: Read the members of your team
-            TEAM_NOTIFY: Allow the notifying of Teams
-            CHATS_ACCESS_ALL: Allow the access of All Chats
-            CHATS_ACCESS_ASSIGNED: Allow the access of assigned Chats
-            CHATS_DELETE: Allow the deletion of Chats
-            MESSAGES_SEND_TO_ASSIGNED: Allow the sending of Messages to Assigned
-            MESSAGES_SEND_TO_ALL: Allow the access of Messages to All
-            MESSAGES_SCHEDULE: Allow the scheduling of Messages
-            MESSAGES_DELETE: Allow the deletion of Messages
-            GROUPS_CREATE: Allow the creating of Groups
-            GROUPS_UPDATE: Allow the updating of Groups
-            NOTES: Allow the usage of Notes
-            NOTIFICATION_READ: Allow the reading of Notifications
-            NOTIFICATION_CREATE: Allow the creation of Notifications
-            NOTIFICATION_UPDATE: Allow the updating of Notifications
-            NOTIFICATION_DELETE: Allow the deletion of Notifications
-            INTEGRATIONS_UPDATE: Update private integrations for notifications API
+            USERS_DELETE: Delete your account
+            ORG_UPDATE: Modify the details of the Organization
+            ORGLINK_CREATE: Create a new invite link for the organization
+            ORGLINK_READ: Read invite links of the Organization
+            ORGMEMBERS_UPDATE: Update/delete Organization members
+            ORGMEMBERS_READ: Read the members of your Organization
+            TEAM_NOTIFY: Allow the notifying of Organizations
             ADMIN_PANEL_ACCESS: Access admin level functionality
-            PAYMENTS_READ: Read payments
-            PAYMENTS_UPDATE: Update/make new payments
-            WA_LIVE_EVENTS: Can this person receive live events of this account
-            CHATDADDY_HOOK: Read/Update API Web hooks

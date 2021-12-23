@@ -53,62 +53,17 @@ export interface paths {
 export interface components {
   schemas: {
     Scope:
-      | "WA_STATE"
-      | "CONTACTS_READ_ASSIGNED"
-      | "CONTACTS_READ_ALL"
-      | "CONTACTS_EXPORT_BUTTON"
-      | "CONTACTS_CREATE"
-      | "CONTACTS_DELETE"
-      | "CONTACTS_UPDATE"
-      | "CAMPAIGNS_READ"
-      | "CAMPAIGNS_CREATE"
-      | "CAMPAIGNS_DELETE"
-      | "CAMPAIGNS_UPDATE"
-      | "KEYWORD_READ"
-      | "KEYWORD_CREATE"
-      | "KEYWORD_DELETE"
-      | "KEYWORD_UPDATE"
-      | "TEMPLATES_READ"
-      | "TEMPLATES_CREATE"
-      | "TEMPLATES_DELETE"
-      | "TEMPLATES_UPDATE"
-      | "TAGS_READ"
-      | "TAGS_CREATE"
-      | "TAGS_DELETE"
       | "TOKENS_READ"
       | "TOKENS_DELETE"
       | "USERS_PATCH"
-      | "REFERRAL_APPLY_CREDIT"
-      | "TEAM_UPDATE"
-      | "ACCOUNT_CREATE"
-      | "ACCOUNT_READ"
-      | "ACCOUNT_DELETE"
-      | "ACCOUNT_PATCH"
-      | "TEAMLINK_CREATE"
-      | "TEAMLINK_READ"
-      | "TEAMMEMBERS_UPDATE"
-      | "TEAMMEMBERS_READ"
+      | "USERS_DELETE"
+      | "ORG_UPDATE"
+      | "ORGLINK_CREATE"
+      | "ORGLINK_READ"
+      | "ORGMEMBERS_UPDATE"
+      | "ORGMEMBERS_READ"
       | "TEAM_NOTIFY"
-      | "CHATS_ACCESS_ALL"
-      | "CHATS_ACCESS_ASSIGNED"
-      | "CHATS_DELETE"
-      | "MESSAGES_SEND_TO_ASSIGNED"
-      | "MESSAGES_SEND_TO_ALL"
-      | "MESSAGES_SCHEDULE"
-      | "MESSAGES_DELETE"
-      | "GROUPS_CREATE"
-      | "GROUPS_UPDATE"
-      | "NOTES"
-      | "NOTIFICATION_READ"
-      | "NOTIFICATION_CREATE"
-      | "NOTIFICATION_UPDATE"
-      | "NOTIFICATION_DELETE"
-      | "INTEGRATIONS_UPDATE"
-      | "ADMIN_PANEL_ACCESS"
-      | "PAYMENTS_READ"
-      | "PAYMENTS_UPDATE"
-      | "WA_LIVE_EVENTS"
-      | "CHATDADDY_HOOK";
+      | "ADMIN_PANEL_ACCESS";
     JWT: {
       /** Binary representation of the scope array */
       scope: string;
@@ -132,7 +87,7 @@ export interface components {
       returnRefreshToken?: boolean;
       /** This will be the base64 encoded SHA256 of the plaintext password */
       password: string;
-      /** The team ID to generate the token for, lastUsedOrgId will be used otherwise */
+      /** The organization ID to generate the token for, lastUsedOrgId will be used otherwise */
       orgId?: string;
       scopes?: components["schemas"]["Scope"][];
       /** Should logging in with this organization ID update the lastUsedOrgId for login */
@@ -145,7 +100,7 @@ export interface components {
       /** The organization ID to generate the token for, lastUsedOrgId will be used otherwise */
       orgId: string;
       scopes?: components["schemas"]["Scope"][];
-      /** Should fetching the token of a new team update the lastUsedOrgId for login */
+      /** Should fetching the token of a new organization update the lastUsedOrgId for login */
       updateLastUsedOrgId?: boolean;
       /** Force the generation of an access token */
       force?: boolean;
@@ -213,7 +168,7 @@ export interface components {
       firstName: string;
       lastName: string;
       email: string;
-      /** The last used team ID, your refresh token when logging in is generated for this team */
+      /** The last used organization ID, your refresh token when logging in is generated for this organization */
       lastUsedOrgId?: string;
       location?: string;
       gender?: "Male" | "Female" | "Other";
