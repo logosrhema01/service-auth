@@ -11,9 +11,6 @@ export interface paths {
     /** If the token is not specified, all tokens of the user are revoked */
     delete: operations["tokenDelete"];
   };
-  "/token/external": {
-    post: operations["tokenPostExternal"];
-  };
   "/invite-links": {
     /**
      * To generate an invite link for a specific set of scopes, you must also have the same set of scopes.
@@ -25,17 +22,18 @@ export interface paths {
   "/invite-links/{id}": {
     get: operations["inviteLinksGet"];
   };
-  "/teams": {
-    get: operations["teamsGet"];
+  "/orgs": {
+    get: operations["orgsGet"];
+    post: operations["orgsPost"];
     /**
-     * - If you want to update/delete members -- ensure you have the `TEAMMEMBERS_UPDATE` scope
-     * - If you want to delete invite links -- ensure you have the `TEAMLINKS_UPDATE` scope
-     * - Also you cannot delete/update yourself in the team. If you attempt to do so, a 400 will be returned
+     * - If you want to update/delete members -- ensure you have the `ORGMEMBERS_UPDATE` scope
+     * - If you want to delete invite links -- ensure you have the `ORGLINKS_UPDATE` scope
+     * - Also you cannot delete/update yourself in the organization. If you attempt to do so, a 400 will be returned
      */
-    patch: operations["teamsPatch"];
+    patch: operations["orgsPatch"];
   };
-  "/teams/join": {
-    post: operations["teamsJoinInvite"];
+  "/orgs/join": {
+    post: operations["orgsJoinInvite"];
   };
   "/users": {
     get: operations["usersGet"];
@@ -46,9 +44,6 @@ export interface paths {
   };
   "/users/password": {
     patch: operations["usersPasswordPatch"];
-  };
-  "/otp": {
-    post: operations["otpPost"];
   };
   "/notify": {
     post: operations["notify"];
@@ -121,47 +116,37 @@ export interface components {
       iat: number;
       user: {
         id: string;
-        teamId: string;
-        fullName?: string;
-        phoneNumber: number;
+        orgId: string;
+        firstName?: string;
+        lastName?: string;
+        email: number;
       };
     };
-    /** Login with Boutir */
-    BoutirTokenRequest: {
-      type: "boutir";
-      username: string;
-      password: string;
-    };
-    ExternalTokenRequest: components["schemas"]["BoutirTokenRequest"];
     TokenPostResponse: {
       access_token: string;
       refresh_token?: string;
       refresh_token_expiry?: components["schemas"]["Timestamp"];
     };
-    ExternalTokenPostResponse: {
-      /** Was the user just created */
-      created?: boolean;
-    } & components["schemas"]["TokenPostResponse"];
     PasswordAuthRequest: {
-      phoneNumber: number;
+      email: string;
       returnRefreshToken?: boolean;
       /** This will be the base64 encoded SHA256 of the plaintext password */
       password: string;
-      /** The team ID to generate the token for, lastUsedTeam will be used otherwise */
-      teamId?: string;
+      /** The team ID to generate the token for, lastUsedOrgId will be used otherwise */
+      orgId?: string;
       scopes?: components["schemas"]["Scope"][];
-      /** Should logging in with this team ID update the lastUsedTeam for login */
-      updateLastUsedTeam?: boolean;
+      /** Should logging in with this organization ID update the lastUsedOrgId for login */
+      updateLastUsedOrgId?: boolean;
       /** Force the generation of an access token */
       force?: boolean;
     };
     RefreshTokenLoginRequest: {
       refreshToken: string;
-      /** The team ID to generate the token for, lastUsedTeam will be used otherwise */
-      teamId: string;
+      /** The organization ID to generate the token for, lastUsedOrgId will be used otherwise */
+      orgId: string;
       scopes?: components["schemas"]["Scope"][];
-      /** Should fetching the token of a new team update the lastUsedTeam for login */
-      updateLastUsedTeam?: boolean;
+      /** Should fetching the token of a new team update the lastUsedOrgId for login */
+      updateLastUsedOrgId?: boolean;
       /** Force the generation of an access token */
       force?: boolean;
     };
@@ -169,8 +154,8 @@ export interface components {
       | components["schemas"]["PasswordAuthRequest"]
       | components["schemas"]["RefreshTokenLoginRequest"];
     OAuthRequest: {
-      /** The phone number */
-      username: string;
+      /** The email */
+      email: string;
       /** Plaintext password */
       password: string;
       grant_type?: "password";
@@ -178,7 +163,7 @@ export interface components {
       scope?: string;
     };
     /**
-     * A refresh token allows you to generate access tokens to access & update things on ChatDaddy services.
+     * A refresh token allows you to generate access tokens to access & update things on Alte services.
      * A refresh token will expire and become invalidated after 14 days of no activity.
      */
     RefreshToken: {
@@ -188,68 +173,92 @@ export interface components {
       expiresAt: components["schemas"]["Timestamp"];
     };
     NotifyModel: {
-      whatsapp?: boolean;
       email?: boolean;
     };
     ResetPassword: {
       password: string;
     };
     UserPatch: {
-      fullName?: string;
-      emailAddress?: string | null;
+      firstName?: string;
+      lastName?: string;
+      email?: string;
       notify?: components["schemas"]["NotifyModel"];
-      /** Phone number. Only admin access can modify */
-      phoneNumber?: number;
-      /** new password. Only admin access can modify */
+      /** new password. */
       password?: string;
+      dob?: components["schemas"]["Timestamp"];
+      gender?: "Male" | "Female" | "Other";
+      location?: string;
+      phone?: string;
     };
     UserCreate: {
-      fullName: string;
-      /** Will only contain numbers, no + sign, brackets etc. */
-      phoneNumber: number;
+      firstName: string;
+      lastName: string;
+      email: string;
       /** SHA256 of the plaintext password pls */
       password: string;
-      emailAddress?: string | null;
       notify?: components["schemas"]["NotifyModel"];
+      dob: components["schemas"]["Timestamp"];
+      gender?: "Male" | "Female" | "Other";
+      location?: string;
+      phone?: string;
       /** Sign up with a referral code */
       referralCode?: string;
     };
-    UserCreateMethod: "admin-panel" | "otp" | "boutir";
+    UserCreateMethod: "admin-panel" | "alte";
     User: {
       id: string;
       createdAt: components["schemas"]["Timestamp"];
       updatedAt: components["schemas"]["Timestamp"];
       disabledAt?: components["schemas"]["Timestamp"];
-      fullName: string;
+      firstName: string;
+      lastName: string;
+      email: string;
       /** The last used team ID, your refresh token when logging in is generated for this team */
-      lastUsedTeamId?: string;
+      lastUsedOrgId?: string;
+      location?: string;
+      gender?: "Male" | "Female" | "Other";
       /** Will only contain numbers, no + sign, brackets etc. */
-      phoneNumber: number;
-      emailAddress?: string | null;
+      phone?: string;
       createdByMethod?: components["schemas"]["UserCreateMethod"];
-      notify: components["schemas"]["NotifyModel"];
+      notify?: components["schemas"]["NotifyModel"];
       /** The referral code used for sign-up */
       referralCode?: string | null;
-      memberships?: components["schemas"]["TeamMember"][];
+      memberships?: components["schemas"]["OrgMember"][];
     };
-    TeamMember: {
-      team?: components["schemas"]["Team"];
+    OrgMember: {
+      org?: components["schemas"]["Organization"];
       user?: components["schemas"]["User"];
       userId: string;
-      teamId: string;
+      orgId: string;
       addedAt: components["schemas"]["Timestamp"];
       addedBy?: string | null;
+      role?: "admin" | "hr" | "mentor" | "student" | "sudo";
       scopes: components["schemas"]["Scope"][];
     };
-    TeamMetadata: {
-      companyName?: string;
-      companyEmailAddress?: string;
-      companyWebsite?: string;
+    OrgCreate: {
+      name?: string;
+      email?: string;
+      url?: string;
+      mode?: "online" | "traditional" | "hybrid";
+      isHiring?: boolean;
+      isAdmitting?: boolean;
+      /** organization subscription plan, enums TBD */
+      plan?: string;
+    };
+    OrgMetadata: {
+      name?: string;
+      email?: string;
+      url?: string;
+      mode?: "online" | "traditional" | "hybrid";
+      isHiring?: boolean;
+      isAdmitting?: boolean;
+      /** organization subscription plan, enums TBD */
+      plan?: string;
     };
     InviteLink: {
       id: string;
-      /** The team it can join */
-      teamId: string;
+      /** The org it can join */
+      orgId: string;
       /** User ID of the person who created the link */
       createdBy: string;
       createdAt: components["schemas"]["Timestamp"];
@@ -257,28 +266,33 @@ export interface components {
       /** The scopes allowed for the invite link */
       scopes: components["schemas"]["Scope"][];
     };
-    Team: {
+    Organization: {
       id: string;
       createdAt: components["schemas"]["Timestamp"];
       updatedAt: components["schemas"]["Timestamp"];
-      /** Who created the team */
+      /** Who created the Organization */
       createdBy?: string;
       name: string;
-      /** Is an admin team */
-      isAdmin?: boolean;
-      /** The max scopes allowed */
-      scopes: components["schemas"]["Scope"][];
-      metadata: components["schemas"]["TeamMetadata"];
-      members?: components["schemas"]["TeamMember"][];
+      email?: string;
+      url?: string;
+      mode?: "online" | "traditional" | "hybrid";
+      isHiring?: boolean;
+      isAdmitting?: boolean;
+      /** organization subscription plan, enums TBD */
+      plan?: string;
       inviteLinks?: components["schemas"]["InviteLink"][];
     };
-    TeamPatchRequest: {
+    OrgPatchRequest: {
       name?: string;
-      metadata?: components["schemas"]["TeamMetadata"];
+      email?: string;
+      url?: string;
+      mode?: "online" | "traditional" | "hybrid";
+      isHiring?: boolean;
+      isAdmitting?: boolean;
       members?: {
         id: string;
         scopes?: components["schemas"]["Scope"][];
-        /** If set, will delete the team member */
+        /** If set, will delete the organization member */
         delete?: true;
       }[];
       inviteLinks?: {
@@ -286,12 +300,6 @@ export interface components {
         /** If set, will delete the invite link */
         delete?: true;
       }[];
-    };
-    OTP: {
-      phoneNumber: number;
-      otp?: number;
-      expiresAt: components["schemas"]["Timestamp"];
-      resendsLeft: number;
     };
     Timestamp: Date | string;
     NotificationResult: string | boolean;
@@ -371,21 +379,6 @@ export interface operations {
       500: components["responses"]["ErrorResponse"];
     };
   };
-  tokenPostExternal: {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["ExternalTokenPostResponse"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ExternalTokenRequest"];
-      };
-    };
-  };
   /**
    * To generate an invite link for a specific set of scopes, you must also have the same set of scopes.
    * Eg. you cannot generate a link which gives access to `MESSAGE_SEND` when you don't have access to `MESSAGE_SEND` yourself.
@@ -432,24 +425,24 @@ export interface operations {
       500: components["responses"]["ErrorResponse"];
     };
   };
-  teamsGet: {
+  orgsGet: {
     parameters: {
       query: {
         /** Search by name, ID, invite code, etc. */
         q?: string;
-        /** Fetch specific teams by ID */
+        /** Fetch specific orgs by ID */
         id?: string[];
-        /** teams that contain this user ID */
+        /** orgs that contain this user ID */
         userId?: string;
         /** The numbers of items to return */
         count?: number;
         /** The page number */
         page?: number;
-        /** Should include the team members. Will only return members for which you have the `TEAMMEMBERS_READ` scope */
-        includeTeamMembers?: boolean;
-        /** Should include the invite links.  Will only return invite links for which you have the `TEAMLINKS_READ` scope */
+        /** Should include the organization members. Will only return members for which you have the `ORGMEMBERS_READ` scope */
+        includeOrgMembers?: boolean;
+        /** Should include the invite links.  Will only return invite links for which you have the `ORGLINKS_READ` scope */
         includeInviteLinks?: boolean;
-        /** include the count of the total teams */
+        /** include the count of the total orgs */
         includeTotal?: boolean;
       };
     };
@@ -459,7 +452,7 @@ export interface operations {
         content: {
           "application/json": {
             total?: number;
-            teams: components["schemas"]["Team"][];
+            orgs: components["schemas"]["Organization"][];
           };
         };
       };
@@ -469,12 +462,7 @@ export interface operations {
       500: components["responses"]["ErrorResponse"];
     };
   };
-  /**
-   * - If you want to update/delete members -- ensure you have the `TEAMMEMBERS_UPDATE` scope
-   * - If you want to delete invite links -- ensure you have the `TEAMLINKS_UPDATE` scope
-   * - Also you cannot delete/update yourself in the team. If you attempt to do so, a 400 will be returned
-   */
-  teamsPatch: {
+  orgsPost: {
     responses: {
       /** OK */
       200: {
@@ -491,11 +479,37 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["TeamPatchRequest"];
+        "application/json": components["schemas"]["OrgCreate"];
       };
     };
   };
-  teamsJoinInvite: {
+  /**
+   * - If you want to update/delete members -- ensure you have the `ORGMEMBERS_UPDATE` scope
+   * - If you want to delete invite links -- ensure you have the `ORGLINKS_UPDATE` scope
+   * - Also you cannot delete/update yourself in the organization. If you attempt to do so, a 400 will be returned
+   */
+  orgsPatch: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            success: boolean;
+          };
+        };
+      };
+      400: components["responses"]["ErrorResponse"];
+      401: components["responses"]["ErrorResponse"];
+      403: components["responses"]["ErrorResponse"];
+      500: components["responses"]["ErrorResponse"];
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OrgPatchRequest"];
+      };
+    };
+  };
+  orgsJoinInvite: {
     parameters: {
       query: {
         /** inviteLink id */
@@ -611,23 +625,6 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["ResetPassword"];
-      };
-    };
-  };
-  otpPost: {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["OTP"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          phoneNumber: string;
-        };
       };
     };
   };
