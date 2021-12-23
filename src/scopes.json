@@ -113,7 +113,7 @@
     ],
     "group": "Organization Access"
   },
-  "TEAM_NOTIFY": {
+  "ORG_NOTIFY": {
     "number": 9,
     "description": "Allow the notifying of Organizations",
     "features": [],

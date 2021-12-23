@@ -640,7 +640,7 @@ components:
         - ORGLINK_READ
         - ORGMEMBERS_UPDATE
         - ORGMEMBERS_READ
-        - TEAM_NOTIFY
+        - ORG_NOTIFY
         - ADMIN_PANEL_ACCESS
     JWT:
       type: object
@@ -1238,5 +1238,5 @@ components:
             ORGLINK_READ: Read invite links of the Organization
             ORGMEMBERS_UPDATE: Update/delete Organization members
             ORGMEMBERS_READ: Read the members of your Organization
-            TEAM_NOTIFY: Allow the notifying of Organizations
+            ORG_NOTIFY: Allow the notifying of Organizations
             ADMIN_PANEL_ACCESS: Access admin level functionality

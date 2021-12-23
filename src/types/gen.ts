@@ -62,7 +62,7 @@ export interface components {
       | "ORGLINK_READ"
       | "ORGMEMBERS_UPDATE"
       | "ORGMEMBERS_READ"
-      | "TEAM_NOTIFY"
+      | "ORG_NOTIFY"
       | "ADMIN_PANEL_ACCESS";
     JWT: {
       /** Binary representation of the scope array */
