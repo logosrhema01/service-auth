@@ -14,8 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@logosrhema01/service-auth-client": "git+https://github.com/logosrhema01/service-auth-client.git",
     "@hapi/boom": "^9.1.2",
+    "@logosrhema01/service-auth-client": "git+https://github.com/logosrhema01/service-auth-client.git",
     "chance": "^1.1.7",
     "dotenv": "^8.2.0",
     "got": "^11.8.2",
@@ -23,7 +23,8 @@
     "pg": "^8.7.1",
     "pino": "^6.11.3",
     "typeorm": "^0.2.31",
-    "typeorm-naming-strategies": "^2.0.0"
+    "typeorm-naming-strategies": "^2.0.0",
+    "url": "^0.11.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.76",
