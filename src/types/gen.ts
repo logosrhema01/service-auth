@@ -165,6 +165,7 @@ export interface components {
       createdAt: components["schemas"]["Timestamp"];
       updatedAt: components["schemas"]["Timestamp"];
       disabledAt?: components["schemas"]["Timestamp"];
+      dob: components["schemas"]["Timestamp"];
       firstName: string;
       lastName: string;
       email: string;
@@ -172,7 +173,7 @@ export interface components {
       lastUsedOrgId?: string;
       location?: string;
       gender?: "Male" | "Female" | "Other";
-      /** Will only contain numbers, no + sign, brackets etc. */
+      /** Will only contain the country code eg. +233 etc. */
       phone?: string;
       createdByMethod?: components["schemas"]["UserCreateMethod"];
       notify?: components["schemas"]["NotifyModel"];
@@ -187,7 +188,7 @@ export interface components {
       orgId: string;
       addedAt: components["schemas"]["Timestamp"];
       addedBy?: string | null;
-      role?: "admin" | "hr" | "mentor" | "student" | "sudo";
+      role: "admin" | "hr" | "mentor" | "student" | "sudo";
       scopes: components["schemas"]["Scope"][];
     };
     OrgCreate: {
@@ -236,6 +237,8 @@ export interface components {
       /** organization subscription plan, enums TBD */
       plan?: string;
       inviteLinks?: components["schemas"]["InviteLink"][];
+      /** The max scopes allowed */
+      scopes: components["schemas"]["Scope"][];
     };
     OrgPatchRequest: {
       name?: string;

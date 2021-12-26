@@ -920,6 +920,7 @@ components:
         - firstName
         - lastName
         - email
+        - dob
       properties:
         id:
           type: string
@@ -929,6 +930,8 @@ components:
         updatedAt:
           $ref: '#/components/schemas/Timestamp'
         disabledAt:
+          $ref: '#/components/schemas/Timestamp'
+        dob:
           $ref: '#/components/schemas/Timestamp'
         firstName:
           maxLength: 100
@@ -946,7 +949,6 @@ components:
           example: alte@lms.edu
         lastUsedOrgId:
           type: string
-          format: uuid
           description: >-
             The last used organization ID, your refresh token when logging in is
             generated for this organization
@@ -961,7 +963,7 @@ components:
             - Other
         phone:
           type: string
-          description: Will only contain numbers, no + sign, brackets etc.
+          description: Will only contain the country code eg. +233 etc.
           example: '+911234567789'
         createdByMethod:
           $ref: '#/components/schemas/UserCreateMethod'
@@ -983,6 +985,7 @@ components:
         - addedAt
         - userId
         - orgId
+        - role
       properties:
         org:
           $ref: '#/components/schemas/Organization'
@@ -1133,6 +1136,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InviteLink'
+        scopes:
+          type: array
+          description: The max scopes allowed
+          items:
+            $ref: '#/components/schemas/Scope'
     OrgPatchRequest:
       type: object
       additionalProperties: false
