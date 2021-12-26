@@ -10,7 +10,7 @@ const NamingStrategy = require('typeorm-naming-strategies').SnakeNamingStrategy
 module.exports = {
     type: uri.protocol.slice(0, -1),
     host: uri.hostname,
-    port: uri.port || 3306,
+    port: uri.port || 5432,
     username: uri.username,
     password: uri.password || undefined,
     database: uri.pathname.slice(1),
