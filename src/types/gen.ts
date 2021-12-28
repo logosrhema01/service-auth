@@ -124,6 +124,8 @@ export interface components {
     RefreshToken: {
       token: string;
       userId: string;
+      /** IP address of the user who created the refresh token */
+      revokedBy?: string;
       createdAt: components["schemas"]["Timestamp"];
       expiresAt: components["schemas"]["Timestamp"];
     };

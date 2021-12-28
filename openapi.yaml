@@ -804,6 +804,9 @@ components:
           type: string
         userId:
           type: string
+        revokedBy:
+          type: string
+          description: IP address of the user who created the refresh token
         createdAt:
           $ref: '#/components/schemas/Timestamp'
         expiresAt:
